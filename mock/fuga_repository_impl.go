@@ -9,3 +9,15 @@ type FugaRepositoryImpl struct{}
 func (_ *FugaRepositoryImpl) Insert(entity *model.Fuga) (bool, error) {
 	return true, nil
 }
+
+func (_ *FugaRepositoryImpl) Update(entity *model.Fuga) (bool, error) {
+	return true, nil
+}
+
+func (_ *FugaRepositoryImpl) Select(ids []int) ([]*model.Fuga, error) {
+	return make([]*model.Fuga, 0), nil
+}
+
+func (_ *FugaRepositoryImpl) Delete(id int) (bool, error) {
+	return true, nil
+}
