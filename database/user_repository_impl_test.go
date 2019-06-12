@@ -8,23 +8,23 @@ import (
 	"github.com/ngiyshhk/golang-clean-arch-entity/model"
 )
 
-func truncate(t *testing.T, repo repository.FugaRepository) {
-	fugas, err := repo.Select([]int{})
+func truncate(t *testing.T, repo repository.UserRepository) {
+	users, err := repo.Select([]int{})
 	if err != nil {
 		t.Fatal("failed to select all")
 	}
 
-	for _, fuga := range fugas {
-		repo.Delete(fuga.ID)
+	for _, user := range users {
+		repo.Delete(user.ID)
 	}
 }
 
 func TestCreateNormal(t *testing.T) {
-	repo := &FugaRepositoryImpl{}
+	repo := &UserRepositoryImpl{}
 	truncate(t, repo)
 
-	fuga := &model.Fuga{ID: 1, Name: "fuga1", Age: 20}
-	res, err := repo.Insert(fuga)
+	user := &model.User{ID: 1, Name: "user1", Age: 20}
+	res, err := repo.Insert(user)
 	if res != true {
 		t.Errorf("res is not true. got=%t", res)
 	}
@@ -34,11 +34,11 @@ func TestCreateNormal(t *testing.T) {
 }
 
 func TestCreateError(t *testing.T) {
-	repo := &FugaRepositoryImpl{}
+	repo := &UserRepositoryImpl{}
 	truncate(t, repo)
 
-	fuga := &model.Fuga{ID: 1, Name: "fuga1", Age: 20}
-	res, err := repo.Insert(fuga)
+	user := &model.User{ID: 1, Name: "user1", Age: 20}
+	res, err := repo.Insert(user)
 	if res != false {
 		t.Errorf("res is not false. got=%t", res)
 	}
@@ -48,11 +48,11 @@ func TestCreateError(t *testing.T) {
 }
 
 func TestUpdateNormal(t *testing.T) {
-	repo := &FugaRepositoryImpl{}
+	repo := &UserRepositoryImpl{}
 	truncate(t, repo)
 
-	fuga := &model.Fuga{ID: 1, Name: "fuga1", Age: 20}
-	res, err := repo.Update(fuga)
+	user := &model.User{ID: 1, Name: "user1", Age: 20}
+	res, err := repo.Update(user)
 	if res != true {
 		t.Errorf("res is not true. got=%t", res)
 	}
@@ -62,11 +62,11 @@ func TestUpdateNormal(t *testing.T) {
 }
 
 func TestUpdateError(t *testing.T) {
-	repo := &FugaRepositoryImpl{}
+	repo := &UserRepositoryImpl{}
 	truncate(t, repo)
 
-	fuga := &model.Fuga{ID: 1, Name: "fuga1", Age: 20}
-	res, err := repo.Update(fuga)
+	user := &model.User{ID: 1, Name: "user1", Age: 20}
+	res, err := repo.Update(user)
 	if res != false {
 		t.Errorf("res is not false. got=%t", res)
 	}
@@ -76,7 +76,7 @@ func TestUpdateError(t *testing.T) {
 }
 
 func TestDeleteNormal(t *testing.T) {
-	repo := &FugaRepositoryImpl{}
+	repo := &UserRepositoryImpl{}
 	truncate(t, repo)
 
 	res, err := repo.Delete(1)
@@ -89,7 +89,7 @@ func TestDeleteNormal(t *testing.T) {
 }
 
 func TestDeleteError(t *testing.T) {
-	repo := &FugaRepositoryImpl{}
+	repo := &UserRepositoryImpl{}
 	truncate(t, repo)
 
 	res, err := repo.Delete(1)
@@ -102,20 +102,20 @@ func TestDeleteError(t *testing.T) {
 }
 
 func TestSelectNormal(t *testing.T) {
-	fuga1 := &model.Fuga{ID: 1, Name: "fuga1", Age: 20}
-	fuga2 := &model.Fuga{ID: 2, Name: "fuga2", Age: 21}
-	fugaFixtures := []*model.Fuga{fuga1, fuga2}
+	user1 := &model.User{ID: 1, Name: "user1", Age: 20}
+	user2 := &model.User{ID: 2, Name: "user2", Age: 21}
+	userFixtures := []*model.User{user1, user2}
 
-	repo := &FugaRepositoryImpl{}
+	repo := &UserRepositoryImpl{}
 	res, err := repo.Select([]int{1, 2})
-	if len(res) != len(fugaFixtures) {
-		t.Errorf("len(res) is not %d. got=%d", len(fugaFixtures), len(res))
+	if len(res) != len(userFixtures) {
+		t.Errorf("len(res) is not %d. got=%d", len(userFixtures), len(res))
 	}
 	for i := 0; i < len(res); i++ {
-		if res[i].ID != fugaFixtures[i].ID {
-			t.Errorf("res[%d].ID is not %d. got=%d", i, fugaFixtures[i].ID, res[i].ID)
-			t.Errorf("res[%d].Name is not %s. got=%s", i, fugaFixtures[i].Name, res[i].Name)
-			t.Errorf("res[%d].Age is not %d. got=%d", i, fugaFixtures[i].Age, res[i].Age)
+		if res[i].ID != userFixtures[i].ID {
+			t.Errorf("res[%d].ID is not %d. got=%d", i, userFixtures[i].ID, res[i].ID)
+			t.Errorf("res[%d].Name is not %s. got=%s", i, userFixtures[i].Name, res[i].Name)
+			t.Errorf("res[%d].Age is not %d. got=%d", i, userFixtures[i].Age, res[i].Age)
 		}
 	}
 	if err != nil {
@@ -124,7 +124,7 @@ func TestSelectNormal(t *testing.T) {
 }
 
 func TestSelectError(t *testing.T) {
-	repo := &FugaRepositoryImpl{}
+	repo := &UserRepositoryImpl{}
 	res, err := repo.Select([]int{1, 2})
 	if res != nil {
 		t.Errorf("res is not nil. got=%v", res)
