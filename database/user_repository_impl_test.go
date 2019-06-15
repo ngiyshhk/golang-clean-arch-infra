@@ -3,10 +3,16 @@ package database
 import (
 	"testing"
 
-	"github.com/ngiyshhk/golang-clean-arch-usecase/repository"
+	"github.com/jinzhu/gorm"
+	_ "github.com/jinzhu/gorm/dialects/mysql"
 
 	"github.com/ngiyshhk/golang-clean-arch-entity/model"
+	"github.com/ngiyshhk/golang-clean-arch-usecase/repository"
 )
+
+var user1 = &model.User{ID: 1, Name: "user1", Age: 20}
+var user2 = &model.User{ID: 2, Name: "user2", Age: 21}
+var userFixtures = []*model.User{user1, user2}
 
 func truncate(t *testing.T, repo repository.UserRepository) {
 	users, err := repo.Select([]int{})
@@ -19,11 +25,26 @@ func truncate(t *testing.T, repo repository.UserRepository) {
 	}
 }
 
-func TestCreateNormal(t *testing.T) {
-	repo := &UserRepositoryImpl{}
-	truncate(t, repo)
+func fixtures(t *testing.T, repo repository.UserRepository) {
+	for _, user := range userFixtures {
+		_, err := repo.Insert(user)
+		if err != nil {
+			t.Fatal(err)
+		}
+	}
+}
 
-	user := &model.User{ID: 1, Name: "user1", Age: 20}
+func TestCreateNormal(t *testing.T) {
+	db, err := gorm.Open("mysql", "root:root@/clean_arch?charset=utf8&parseTime=True")
+	if err != nil {
+		t.Errorf("db connection error. got=%v", err)
+	}
+
+	repo := &UserRepositoryImpl{Db: db}
+	truncate(t, repo)
+	fixtures(t, repo)
+
+	user := &model.User{ID: 11, Name: "user11", Age: 30}
 	res, err := repo.Insert(user)
 	if res != true {
 		t.Errorf("res is not true. got=%t", res)
@@ -34,8 +55,14 @@ func TestCreateNormal(t *testing.T) {
 }
 
 func TestCreateError(t *testing.T) {
-	repo := &UserRepositoryImpl{}
+	db, err := gorm.Open("mysql", "root:root@/clean_arch?charset=utf8&parseTime=True")
+	if err != nil {
+		t.Errorf("db connection error. got=%v", err)
+	}
+
+	repo := &UserRepositoryImpl{Db: db}
 	truncate(t, repo)
+	fixtures(t, repo)
 
 	user := &model.User{ID: 1, Name: "user1", Age: 20}
 	res, err := repo.Insert(user)
@@ -48,8 +75,14 @@ func TestCreateError(t *testing.T) {
 }
 
 func TestUpdateNormal(t *testing.T) {
-	repo := &UserRepositoryImpl{}
+	db, err := gorm.Open("mysql", "root:root@/clean_arch?charset=utf8&parseTime=True")
+	if err != nil {
+		t.Errorf("db connection error. got=%v", err)
+	}
+
+	repo := &UserRepositoryImpl{Db: db}
 	truncate(t, repo)
+	fixtures(t, repo)
 
 	user := &model.User{ID: 1, Name: "user1", Age: 20}
 	res, err := repo.Update(user)
@@ -62,10 +95,16 @@ func TestUpdateNormal(t *testing.T) {
 }
 
 func TestUpdateError(t *testing.T) {
-	repo := &UserRepositoryImpl{}
-	truncate(t, repo)
+	db, err := gorm.Open("mysql", "root:root@/clean_arch?charset=utf8&parseTime=True")
+	if err != nil {
+		t.Errorf("db connection error. got=%v", err)
+	}
 
-	user := &model.User{ID: 1, Name: "user1", Age: 20}
+	repo := &UserRepositoryImpl{Db: db}
+	truncate(t, repo)
+	fixtures(t, repo)
+
+	user := &model.User{ID: 11, Name: "user1", Age: 20}
 	res, err := repo.Update(user)
 	if res != false {
 		t.Errorf("res is not false. got=%t", res)
@@ -76,8 +115,14 @@ func TestUpdateError(t *testing.T) {
 }
 
 func TestDeleteNormal(t *testing.T) {
-	repo := &UserRepositoryImpl{}
+	db, err := gorm.Open("mysql", "root:root@/clean_arch?charset=utf8&parseTime=True")
+	if err != nil {
+		t.Errorf("db connection error. got=%v", err)
+	}
+
+	repo := &UserRepositoryImpl{Db: db}
 	truncate(t, repo)
+	fixtures(t, repo)
 
 	res, err := repo.Delete(1)
 	if res != true {
@@ -88,25 +133,16 @@ func TestDeleteNormal(t *testing.T) {
 	}
 }
 
-func TestDeleteError(t *testing.T) {
-	repo := &UserRepositoryImpl{}
-	truncate(t, repo)
-
-	res, err := repo.Delete(1)
-	if res != false {
-		t.Errorf("res is not false. got=%t", res)
-	}
-	if err == nil {
-		t.Error("err is nil")
-	}
-}
-
 func TestSelectNormal(t *testing.T) {
-	user1 := &model.User{ID: 1, Name: "user1", Age: 20}
-	user2 := &model.User{ID: 2, Name: "user2", Age: 21}
-	userFixtures := []*model.User{user1, user2}
+	db, err := gorm.Open("mysql", "root:root@/clean_arch?charset=utf8&parseTime=True")
+	if err != nil {
+		t.Errorf("db connection error. got=%v", err)
+	}
 
-	repo := &UserRepositoryImpl{}
+	repo := &UserRepositoryImpl{Db: db}
+	truncate(t, repo)
+	fixtures(t, repo)
+
 	res, err := repo.Select([]int{1, 2})
 	if len(res) != len(userFixtures) {
 		t.Errorf("len(res) is not %d. got=%d", len(userFixtures), len(res))
@@ -120,16 +156,5 @@ func TestSelectNormal(t *testing.T) {
 	}
 	if err != nil {
 		t.Errorf("err is not nil. got=%v", err)
-	}
-}
-
-func TestSelectError(t *testing.T) {
-	repo := &UserRepositoryImpl{}
-	res, err := repo.Select([]int{1, 2})
-	if res != nil {
-		t.Errorf("res is not nil. got=%v", res)
-	}
-	if err == nil {
-		t.Error("err is nil")
 	}
 }
