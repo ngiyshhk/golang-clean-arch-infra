@@ -29,8 +29,9 @@ func (*LibraryRepositoryImpl) GetAll() (*model.Libraries, error) {
 		return nil, err
 	}
 
+	// apiの最後に);がついてくるので、除去
 	rep := regexp.MustCompile(`\);$`)
-	clearedBody := rep.ReplaceAll(body, make([]byte, 0))
+	clearedBody := rep.ReplaceAll(body, []byte{})
 
 	var res model.Libraries
 	err = json.Unmarshal(clearedBody, &res)
