@@ -58,7 +58,7 @@ func (repo *UserRepositoryImpl) Update(entity *model.User) (bool, error) {
 
 // Select is
 func (repo *UserRepositoryImpl) Select(ids []int) ([]*model.User, error) {
-	var users []*model.User
+	users := make([]*model.User, 0)
 	lusers := make([]*lUser, 0)
 
 	res := repo.Db.Table("users")
